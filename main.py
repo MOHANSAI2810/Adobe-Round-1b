@@ -47,7 +47,7 @@ def is_heading(text):
     return could_be_heading(text)
 
 
-def extract_headings_from_pdfs(pdf_folder, pdf_files_list):
+def extract_headings(pdf_folder, pdf_files_list):
     """
     Extract headings only from the specified list of PDFs in pdf_files_list.
     """
@@ -117,7 +117,7 @@ def clean_text(text):
     return text.strip()
 
 
-def extract_subsection_text(pdf_path, heading_text, page_number):
+def extract_subsection(pdf_path, heading_text, page_number):
     logging.info(f"Extracting subsection under heading '{heading_text}' in {os.path.basename(pdf_path)} page {page_number}")
     doc = fitz.open(pdf_path)
     collected_text = []
@@ -152,7 +152,7 @@ def extract_subsection_text(pdf_path, heading_text, page_number):
     return clean_text(" ".join(collected_text))  # End of doc reached
 
 
-def semantic_search_headings(all_headings, query, top_k=5, threshold=0.3):
+def semantic_headings(all_headings, query, top_k=5, threshold=0.3):
     logging.info(f"Performing semantic search for query: '{query}'")
     heading_texts = [h[2] for h in all_headings]
     heading_embs = MODEL.encode(heading_texts, convert_to_tensor=True, show_progress_bar=False)
@@ -181,7 +181,7 @@ def semantic_search_headings(all_headings, query, top_k=5, threshold=0.3):
 def main(pdf_folder, persona, job_to_be_done, input_documents):
     # Step 1: Extract headings from the specified PDFs
     pdf_filenames = [doc["filename"] for doc in input_documents]
-    headings_data = extract_headings_from_pdfs(pdf_folder, pdf_filenames)
+    headings_data = extract_headings(pdf_folder, pdf_filenames)
 
     # Flatten for semantic search: list of tuples (pdf_file, page_num, heading_text)
     all_headings = []
@@ -194,7 +194,7 @@ def main(pdf_folder, persona, job_to_be_done, input_documents):
         return
 
     # Step 2: Semantic search to get matched headings using the "job_to_be_done" as query
-    matched_headings = semantic_search_headings(all_headings, job_to_be_done)
+    matched_headings = semantic_headings(all_headings, job_to_be_done)
 
     if not matched_headings:
         logging.info("No matched headings found above threshold for the given query.")
@@ -205,7 +205,7 @@ def main(pdf_folder, persona, job_to_be_done, input_documents):
             heading = entry["heading"]
             page_num = entry["page_number"]
             pdf_path = os.path.join(pdf_folder, pdf_file)
-            subsection = extract_subsection_text(pdf_path, heading, page_num)
+            subsection = extract_subsection(pdf_path, heading, page_num)
             entry["subsection_text"] = subsection
 
     # Step 4: Construct output JSON per requested format
@@ -239,7 +239,7 @@ def main(pdf_folder, persona, job_to_be_done, input_documents):
         "subsection_analysis": subsection_analysis
     }
 
-    output_path = "challenge1b_output.json"
+    output_path = "app/output/output.json"
     with open(output_path, "w", encoding="utf-8") as f_out:
         json.dump(final_output, f_out, ensure_ascii=False, indent=4)
 
@@ -253,20 +253,20 @@ def load_input_json(json_path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python pdf_heading_extractor.py <input_json_path>")
+    # Automatically load the input.json file from the "input" folder
+    input_json_path = os.path.join("app/input", "input.json")
+    
+    if not os.path.isfile(input_json_path):
+        print(f"Input JSON file not found at path: {input_json_path}")
         sys.exit(1)
-
-    input_json_path = sys.argv[1]
+    
     input_data = load_input_json(input_json_path)
 
-    # You need to specify your local folder path where PDF files exist
-    # Make sure that this folder contains the PDFs named in input_data["documents"]
-    pdf_folder = "./pdfs"
+    # pdf_folder is same as input folder where PDFs are present
+    pdf_folder = "app/input"
 
     persona = input_data.get("persona", {}).get("role", "Unknown Persona")
     job_to_be_done = input_data.get("job_to_be_done", {}).get("task", "")
-
     documents = input_data.get("documents", [])
 
     main(pdf_folder, persona, job_to_be_done, documents)

@@ -1,0 +1,5 @@
+PyMuPDF==1.23.6
+sentence-transformers==2.2.2
+torch>=1.9.0
+numpy
+scipy
