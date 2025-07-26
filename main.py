@@ -89,11 +89,11 @@ def extract_headings(pdf_folder, pdf_files_list):
                             # Heading heuristic: font size larger/equal than avg or fixed threshold + regex checks
                             if text and font_size >= max(11, avg_font_size) and could_be_heading(text_norm):
                                 headings.append({
-                                    "page": page_num + 1,
+                                    "page": page_num ,
                                     "heading": text_norm,
                                     "font_size": font_size
                                 })
-                                logging.debug(f"Heading found: '{text_norm}' on page {page_num + 1} (font size {font_size})")
+                                logging.debug(f"Heading found: '{text_norm}' on page {page_num } (font size {font_size})")
 
         # Sort headings by page number and font size descending
         headings = sorted(headings, key=lambda x: (x["page"], -x["font_size"]))
