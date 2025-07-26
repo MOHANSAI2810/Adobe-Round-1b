@@ -38,15 +38,16 @@ docker build -t pdf-heading-extractor .
 3. Run the application using Docker:
 
 ```bash
-docker run -v $(pwd)/app:/app/app pdf-heading-extractor
+docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-heading-extractor
 ```
 
-**Note**: The `-v` flag mounts your local `app` directory to the container, allowing you to place PDFs in `app/input/` and retrieve results from `app/output/`.
+**Note**: The `-v` flags mount your local `input` and `output` directories to the container, allowing you to place PDFs in `input/` and retrieve results from `output/`.
 
 ### Required Dependencies
 
-- `PyMuPDF` (fitz): For PDF processing and text extraction
-- `sentence-transformers`: For semantic similarity calculations
+- `PyMuPDF==1.23.8`: For PDF processing and text extraction
+- `sentence-transformers==2.2.2`: For semantic similarity calculations
+- `torch==2.0.1`: PyTorch backend for sentence transformers
 - `unicodedata`: For text normalization (built-in)
 - `logging`: For application logging (built-in)
 - `json`: For JSON processing (built-in)
@@ -61,13 +62,12 @@ project/
 ├── main.py                 # Main application script
 ├── Dockerfile             # Docker configuration
 ├── requirements.txt       # Python dependencies
-├── .dockerignore         # Docker build exclusions
-├── app/
-│   ├── input/             # Input folder for PDFs and input.json
-│   │   ├── input.json     # Configuration file
-│   │   └── *.pdf          # PDF documents to process
-│   └── output/            # Output folder
-│       └── output.json    # Generated results
+├── temp.py               # Temporary/utility script
+├── input/                 # Input folder for PDFs and input.json
+│   ├── input.json         # Configuration file
+│   └── *.pdf              # PDF documents to process
+├── output/                # Output folder
+│   └── output.json        # Generated results
 └── README.md              # This file
 ```
 
@@ -78,16 +78,16 @@ project/
 Create the required directory structure and place your files:
 
 ```bash
-mkdir -p app/input app/output
+mkdir -p input output
 ```
 
 ### 2. Add PDF Documents
 
-Place your PDF files in the `app/input/` directory.
+Place your PDF files in the `input/` directory.
 
 ### 3. Create Input Configuration
 
-Create `app/input/input.json` with the following structure:
+Create `input/input.json` with the following structure:
 
 ```json
 {
@@ -117,17 +117,17 @@ python main.py
 
 #### Docker Installation:
 ```bash
-docker run -v $(pwd)/app:/app/app pdf-heading-extractor
+docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-heading-extractor
 ```
 
 **For Windows PowerShell:**
 ```powershell
-docker run -v ${PWD}/app:/app/app pdf-heading-extractor
+docker run -v ${PWD}/input:/app/input -v ${PWD}/output:/app/output pdf-heading-extractor
 ```
 
 ### 5. View Results
 
-The application will generate `app/output/output.json` containing:
+The application will generate `output/output.json` containing:
 
 - **Metadata**: Input documents, persona, job description, and timestamp
 - **Extracted Sections**: Matched headings with importance ranking
@@ -179,7 +179,7 @@ You can modify these parameters in the `semantic_headings` function:
 
 ## Output Format
 
-The generated `output.json` contains:
+The generated `output/output.json` contains:
 
 ```json
 {
@@ -229,17 +229,17 @@ All errors are logged with appropriate warning messages.
 
 ### Common Issues
 
-1. **File not found errors**: Ensure PDF files are in the `app/input/` directory
+1. **File not found errors**: Ensure PDF files are in the `input/` directory
 2. **Missing dependencies**: Install all required packages using pip
-3. **Permission errors**: Ensure write permissions for the `app/output/` directory
-4. **Docker volume mount issues**: Ensure the `app` directory exists and has proper permissions
+3. **Permission errors**: Ensure write permissions for the `output/` directory
+4. **Docker volume mount issues**: Ensure the `input` and `output` directories exist and have proper permissions
 
 ### Docker-Specific Issues
 
 1. **Build failures**: Ensure Docker is running and you have sufficient disk space
 2. **Volume mount problems**: 
    - On Windows, use `${PWD}` instead of `$(pwd)` in PowerShell
-   - Ensure the `app` directory exists before running the container
+   - Ensure the `input` and `output` directories exist before running the container
 3. **Permission denied**: Run Docker commands with appropriate permissions
 4. **Model download issues**: The first run may take longer as it downloads the sentence transformer model
 
