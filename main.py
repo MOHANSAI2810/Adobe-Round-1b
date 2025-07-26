@@ -254,7 +254,7 @@ def load_input_json(json_path):
 
 if __name__ == "__main__":
     # Automatically load the input.json file from the "input" folder
-    input_json_path = os.path.join("app/input", "input.json")
+    input_json_path = os.path.join("app/input", "app/input/input.json")
     
     if not os.path.isfile(input_json_path):
         print(f"Input JSON file not found at path: {input_json_path}")
