@@ -17,12 +17,31 @@ A Python application that extracts headings from PDF documents and performs sema
 
 ## Installation
 
+### Option 1: Local Installation
+
 1. Clone or download this repository
 2. Install the required dependencies:
 
 ```bash
 pip install PyMuPDF sentence-transformers
 ```
+
+### Option 2: Docker Installation (Recommended)
+
+1. Clone or download this repository
+2. Build the Docker image:
+
+```bash
+docker build -t pdf-heading-extractor .
+```
+
+3. Run the application using Docker:
+
+```bash
+docker run -v $(pwd)/app:/app/app pdf-heading-extractor
+```
+
+**Note**: The `-v` flag mounts your local `app` directory to the container, allowing you to place PDFs in `app/input/` and retrieve results from `app/output/`.
 
 ### Required Dependencies
 
@@ -40,6 +59,9 @@ pip install PyMuPDF sentence-transformers
 ```
 project/
 ├── main.py                 # Main application script
+├── Dockerfile             # Docker configuration
+├── requirements.txt       # Python dependencies
+├── .dockerignore         # Docker build exclusions
 ├── app/
 │   ├── input/             # Input folder for PDFs and input.json
 │   │   ├── input.json     # Configuration file
@@ -88,8 +110,19 @@ Create `app/input/input.json` with the following structure:
 
 ### 4. Run the Application
 
+#### Local Installation:
 ```bash
 python main.py
+```
+
+#### Docker Installation:
+```bash
+docker run -v $(pwd)/app:/app/app pdf-heading-extractor
+```
+
+**For Windows PowerShell:**
+```powershell
+docker run -v ${PWD}/app:/app/app pdf-heading-extractor
 ```
 
 ### 5. View Results
@@ -189,6 +222,8 @@ All errors are logged with appropriate warning messages.
 - The sentence transformer model is loaded once globally for efficiency
 - Large PDF files may take longer to process
 - Memory usage scales with the number and size of PDF documents
+- Docker containers may have slower initial startup due to model downloading
+- Consider using Docker volumes for persistent model storage across runs
 
 ## Troubleshooting
 
@@ -197,6 +232,16 @@ All errors are logged with appropriate warning messages.
 1. **File not found errors**: Ensure PDF files are in the `app/input/` directory
 2. **Missing dependencies**: Install all required packages using pip
 3. **Permission errors**: Ensure write permissions for the `app/output/` directory
+4. **Docker volume mount issues**: Ensure the `app` directory exists and has proper permissions
+
+### Docker-Specific Issues
+
+1. **Build failures**: Ensure Docker is running and you have sufficient disk space
+2. **Volume mount problems**: 
+   - On Windows, use `${PWD}` instead of `$(pwd)` in PowerShell
+   - Ensure the `app` directory exists before running the container
+3. **Permission denied**: Run Docker commands with appropriate permissions
+4. **Model download issues**: The first run may take longer as it downloads the sentence transformer model
 
 ### Debug Mode
 
