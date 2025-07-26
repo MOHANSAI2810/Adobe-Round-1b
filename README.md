@@ -37,8 +37,19 @@ docker build -t pdf-heading-extractor .
 
 3. Run the application using Docker:
 
+**For Linux/Mac:**
 ```bash
 docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-heading-extractor
+```
+
+**For Windows PowerShell:**
+```powershell
+docker run -v ${PWD}/input:/app/input -v ${PWD}/output:/app/output pdf-heading-extractor
+```
+
+**For Windows Command Prompt:**
+```cmd
+docker run -v %cd%/input:/app/input -v %cd%/output:/app/output pdf-heading-extractor
 ```
 
 **Note**: The `-v` flags mount your local `input` and `output` directories to the container, allowing you to place PDFs in `input/` and retrieve results from `output/`.
@@ -116,6 +127,8 @@ python main.py
 ```
 
 #### Docker Installation:
+
+**For Linux/Mac:**
 ```bash
 docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-heading-extractor
 ```
@@ -123,6 +136,11 @@ docker run -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output pdf-heading-e
 **For Windows PowerShell:**
 ```powershell
 docker run -v ${PWD}/input:/app/input -v ${PWD}/output:/app/output pdf-heading-extractor
+```
+
+**For Windows Command Prompt:**
+```cmd
+docker run -v %cd%/input:/app/input -v %cd%/output:/app/output pdf-heading-extractor
 ```
 
 ### 5. View Results
