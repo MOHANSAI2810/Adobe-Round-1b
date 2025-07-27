@@ -4,15 +4,20 @@ FROM python:3.12.3-slim
 # Set working directory inside the container
 WORKDIR /app
 
-# Copy your script and dependencies
-COPY main.py .
+# Copy requirements first (for cache efficiency)
 COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create output directory (optional, if your script expects it)
+# Copy main script
+COPY main.py .
+
+# Copy input folder (and its PDFs/input.json)
+COPY input ./input
+
+# Create output directory
 RUN mkdir -p /app/output
 
-# Default command without CLI argument, since main.py reads input.json automatically
+# Run the script (input.json is loaded automatically from /app/input)
 CMD ["python", "main.py"]

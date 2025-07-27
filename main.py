@@ -239,7 +239,7 @@ def main(pdf_folder, persona, job_to_be_done, input_documents):
         "subsection_analysis": subsection_analysis
     }
 
-    output_path = "app/output/output.json"
+    output_path = "output/output.json"
     with open(output_path, "w", encoding="utf-8") as f_out:
         json.dump(final_output, f_out, ensure_ascii=False, indent=4)
 
@@ -254,7 +254,7 @@ def load_input_json(json_path):
 
 if __name__ == "__main__":
     # Automatically load the input.json file from the "input" folder
-    input_json_path = os.path.join("app/input", "app/input/input.json")
+    input_json_path = os.path.join("input", "input.json")
     
     if not os.path.isfile(input_json_path):
         print(f"Input JSON file not found at path: {input_json_path}")
@@ -263,7 +263,7 @@ if __name__ == "__main__":
     input_data = load_input_json(input_json_path)
 
     # pdf_folder is same as input folder where PDFs are present
-    pdf_folder = "app/input"
+    pdf_folder = "input"
 
     persona = input_data.get("persona", {}).get("role", "Unknown Persona")
     job_to_be_done = input_data.get("job_to_be_done", {}).get("task", "")
